@@ -25,6 +25,10 @@ enum Commands {
         /// Path to the directory to download the samples at.
         #[arg(long, value_name = "directory", default_value = ".")]
         path: PathBuf,
+
+        /// Whether to write the samples like `sample1.out` or `problem_code.out`.
+        #[arg(long, default_value_t = false)]
+        write_name: bool,
     },
 }
 
@@ -32,7 +36,11 @@ fn main() {
     let args = Args::parse();
 
     match match args.command {
-        Commands::DownloadSamples { problem, path } => cli::download_samples(&problem, path),
+        Commands::DownloadSamples {
+            problem,
+            path,
+            write_name,
+        } => cli::download_samples(&problem, path, write_name),
     } {
         Err(e) => eprintln!("Error: {e:?}"),
         Ok(_) => println!("Samples downloaded!"),
