@@ -65,18 +65,22 @@ fn get_kattis_info(html: Html) -> Result<(String, Vec<Sample>)> {
             .select(&Selector::parse("td > pre").unwrap())
             .collect();
 
-        let input = data[0]
-            .text()
-            .nth(0)
-            .expect("malformed table data who cares")
-            .to_string();
-        let output = data[1]
-            .text()
-            .nth(0)
-            .expect("malformed table data who cares")
-            .to_string();
+        if data.len() == 2 {
+            let input = data[0].text().nth(0).map(|s| s.to_string());
+            let output = data[1]
+                .text()
+                .nth(0)
+                .expect("malformed table data who cares")
+                .to_string();
+            Sample { input, output }
+        } else {
+            let output = data[0].text().nth(0).unwrap().to_string();
 
-        Sample { input, output }
+            Sample {
+                input: None,
+                output,
+            }
+        }
     });
 
     Ok((title.to_string(), sample_info.collect()))

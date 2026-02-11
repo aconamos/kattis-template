@@ -15,7 +15,8 @@ pub struct ProblemCode(String);
 /// A sample input and output
 #[derive(Debug)]
 pub struct Sample {
-    pub input: String,
+    // sometimes, problems have no input!
+    pub input: Option<String>,
     pub output: String,
 }
 
