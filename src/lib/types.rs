@@ -1,19 +1,22 @@
 use std::ops::Deref;
 
 /// Problem code newtype. A problem code is just a string of form [a-z]+.
+#[derive(Debug, Clone)]
 pub struct ProblemCode(String);
 
 /// A sample input and output
+#[derive(Debug)]
 pub struct Sample {
-    input: String,
-    output: String,
+    pub input: String,
+    pub output: String,
 }
 
 /// The info for a given Kattis problem
+#[derive(Debug)]
 pub struct ProblemInfo {
-    code: String,
-    description: String,
-    samples: Vec<Sample>,
+    pub code: ProblemCode,
+    pub title: String,
+    pub samples: Vec<Sample>,
 }
 
 impl ProblemCode {

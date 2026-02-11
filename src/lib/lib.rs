@@ -1,6 +1,7 @@
 pub mod mapper;
 pub mod scraper;
 mod types;
+mod util;
 
 #[cfg(test)]
 mod tests {
