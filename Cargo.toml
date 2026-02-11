@@ -1,0 +1,13 @@
+[package]
+name = "kattis_template_cli"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.101"
+regex = "1.12.3"
+reqwest = "0.13.2"
+
+[lib]
+name = "kattis_template"
+path = "src/lib/lib.rs"
