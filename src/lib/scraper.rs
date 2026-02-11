@@ -22,7 +22,7 @@ pub enum ScraperError {
 }
 
 /// Given a ProblemCode, searches it up, and retrieves the Samples and Title.
-pub fn scrape_kattis_problem(code: ProblemCode) -> Result<ProblemInfo> {
+pub fn scrape_kattis_problem(code: &ProblemCode) -> Result<ProblemInfo> {
     let url = format!("https://open.kattis.com/problems/{}", code.as_ref());
     let res =
         reqwest::blocking::get(url).with_context(|| "problem fetching webpage (connection)")?;
@@ -41,7 +41,7 @@ pub fn scrape_kattis_problem(code: ProblemCode) -> Result<ProblemInfo> {
     let kattis_info = get_kattis_info(html).with_context(|| "problem scraping")?;
 
     Ok(ProblemInfo {
-        code,
+        code: code.clone(),
         title: kattis_info.0,
         samples: kattis_info.1,
     })

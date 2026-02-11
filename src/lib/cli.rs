@@ -5,12 +5,8 @@ use crate::{ProblemCode, scraper};
 
 pub fn download_samples(problem_code: &str, path: PathBuf, write_name: bool) -> Result<()> {
     let problem_code = ProblemCode::new(problem_code)?;
-    let problem_info = scraper::scrape_kattis_problem(problem_code.clone())?;
-    let filename: &str = if write_name {
-        &problem_code.as_ref()
-    } else {
-        "sample"
-    };
+    let problem_info = scraper::scrape_kattis_problem(&problem_code)?;
+    let filename: &str = if write_name { &problem_code } else { "sample" };
 
     for (idx, sample) in problem_info.samples.iter().enumerate() {
         if let Some(input) = &sample.input {
