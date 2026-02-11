@@ -1,10 +1,11 @@
-use kattis_template::mapper;
+use kattis_template::ProblemCode;
+use kattis_template::scraper;
 
 fn main() {
     println!(
         "{:?}",
-        kattis_template::scraper::scrape_kattis_problem(
-            mapper::get_problem_code("https://open.kattis.com/problems/lvable").unwrap(),
+        scraper::scrape_kattis_problem(
+            ProblemCode::new("open.kattis.com/problems/lvable").unwrap()
         )
         .unwrap()
     );

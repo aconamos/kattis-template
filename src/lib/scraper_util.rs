@@ -1,10 +1,11 @@
 use anyhow::Result;
-use scraper::{ElementRef, Selector, html::Select};
+use scraper::{ElementRef, Selector};
 
 use crate::scraper::ScraperError;
 
+/// Scraping helper trait
 pub trait SelectOne {
-    /// Selects one thing
+    /// Selects one thing and errors if there isn't exactly one
     fn select_one(&self, query: &str) -> Result<ElementRef<'_>>;
 }
 

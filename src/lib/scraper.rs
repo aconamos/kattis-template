@@ -1,10 +1,10 @@
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context, Result};
 use reqwest::StatusCode;
 use scraper::{self, Html, Selector};
 use thiserror::Error;
 
+use crate::scraper_util::*;
 use crate::types::{ProblemCode, ProblemInfo, Sample};
-use crate::util::*;
 
 #[derive(Error, Debug)]
 pub enum ScraperError {
@@ -21,6 +21,7 @@ pub enum ScraperError {
     MultipleMatches { selector: String },
 }
 
+/// Given a ProblemCode, searches it up, and retrieves the Samples and Title.
 pub fn scrape_kattis_problem(code: ProblemCode) -> Result<ProblemInfo> {
     let url = format!("https://open.kattis.com/problems/{}", code.as_ref());
     let res =
@@ -47,6 +48,8 @@ pub fn scrape_kattis_problem(code: ProblemCode) -> Result<ProblemInfo> {
 }
 
 /// Given the HTML of a problem's webpage, fetches the ProblemInfo.
+///
+/// This is a function with shitty error handling. That's why it's internal.
 fn get_kattis_info(html: Html) -> Result<(String, Vec<Sample>)> {
     let root = html.root_element();
     let ts_sel = Selector::parse("table.sample").unwrap();
