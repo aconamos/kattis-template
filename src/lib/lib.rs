@@ -5,7 +5,7 @@ pub mod scaffolders {}
 mod scraper_util;
 mod types;
 
-pub use types::ProblemCode;
+pub use types::*;
 
 #[cfg(test)]
 mod tests {

@@ -47,6 +47,10 @@ pub fn scrape_kattis_problem(code: &ProblemCode) -> Result<ProblemInfo> {
     })
 }
 
+pub fn get_contest_problems() -> Result<Vec<ProblemInfo>> {
+    todo!()
+}
+
 /// Given the HTML of a problem's webpage, fetches the ProblemInfo.
 ///
 /// This is a function with shitty error handling. That's why it's internal.

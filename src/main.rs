@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use kattis_template::Backend;
 use kattis_template::ProblemCode;
 use kattis_template::cli;
 use kattis_template::scraper;
@@ -30,6 +31,16 @@ enum Commands {
         #[arg(long, default_value_t = false)]
         write_name: bool,
     },
+
+    /// Initializes a project by writing boilerplate for each problem into a new directory.
+    InitializeContest {
+        /// The contest. This could be a Kattis URL or just the contest code.
+        contest: String,
+
+        /// The language to initialize.
+        #[arg(long)]
+        language: Backend,
+    },
 }
 
 fn main() {
@@ -41,6 +52,7 @@ fn main() {
             path,
             write_name,
         } => cli::download_samples(&problem, path, write_name),
+        Commands::InitializeContest { .. } => todo!(),
     } {
         Err(e) => eprintln!("Error: {e:?}"),
         Ok(_) => println!("Samples downloaded!"),

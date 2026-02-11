@@ -1,4 +1,5 @@
 use anyhow::{Result, anyhow};
+use clap::ValueEnum;
 use std::ops::Deref;
 
 use regex::Regex;
@@ -11,6 +12,16 @@ pub const KATTIS_URL_RE: std::sync::LazyLock<Regex> = std::sync::LazyLock::new(|
 /// Problem code newtype. A problem code is just a string of form [a-z]+.
 #[derive(Debug, Clone)]
 pub struct ProblemCode(String);
+
+/// Represents a given backend (roughly speaking, language, but this is more general to support things like various IDEs)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+pub enum Backend {
+    C,
+    Rust,
+    PythonUv,
+    CsharpDotnet,
+    JavaIntellij,
+}
 
 /// A sample input and output
 #[derive(Debug)]
