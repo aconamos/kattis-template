@@ -1,4 +1,7 @@
+pub mod cli;
+pub mod scaffold;
 pub mod scraper;
+pub mod scaffolders {}
 mod scraper_util;
 mod types;
 
