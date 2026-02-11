@@ -1,6 +1,8 @@
 use anyhow::{Result, anyhow};
 use regex::Regex;
 
+use crate::types::ProblemCode;
+
 pub const KATTIS_URL_PATTERN: &'static str =
     r"^((http(s)?://)?open.kattis.com/(contests/[a-z0-9]+/)?problems/)?(?<code>[a-z]+)$";
 
@@ -8,7 +10,7 @@ pub const KATTIS_URL_PATTERN: &'static str =
 ///     1. raw problem code
 ///     2. kattis url with problem code
 /// If it succeeds, it will return the problem code. Otherwise, returns an error.
-pub fn get_problem_code(input: &str) -> Result<String> {
+pub fn get_problem_code(input: &str) -> Result<ProblemCode> {
     let re = Regex::new(KATTIS_URL_PATTERN).unwrap();
     let captures = re.captures(input);
 
@@ -18,5 +20,5 @@ pub fn get_problem_code(input: &str) -> Result<String> {
         ));
     };
 
-    return Ok(captures["code"].to_string());
+    return Ok(ProblemCode::new_unchecked(&captures["code"]));
 }

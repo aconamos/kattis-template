@@ -1,5 +1,6 @@
 pub mod mapper;
 pub mod scraper;
+mod types;
 
 #[cfg(test)]
 mod tests {
@@ -11,6 +12,7 @@ mod tests {
             "hackyordering",
             get_problem_code("https://open.kattis.com/contests/jna6sj/problems/hackyordering")
                 .expect("should not have error on valid URL")
+                .as_ref()
         )
     }
 
@@ -20,6 +22,7 @@ mod tests {
             "hackyordering",
             get_problem_code("https://open.kattis.com/problems/hackyordering")
                 .expect("should not have error on valid URL")
+                .as_ref()
         )
     }
 
@@ -29,6 +32,7 @@ mod tests {
             "hackyordering",
             get_problem_code("http://open.kattis.com/contests/jna6sj/problems/hackyordering")
                 .expect("should not have error on valid URL")
+                .as_ref()
         )
     }
 
@@ -38,6 +42,7 @@ mod tests {
             "hackyordering",
             get_problem_code("http://open.kattis.com/problems/hackyordering")
                 .expect("should not have error on valid URL")
+                .as_ref()
         )
     }
 
@@ -47,6 +52,7 @@ mod tests {
             "hackyordering",
             get_problem_code("open.kattis.com/contests/jna6sj/problems/hackyordering")
                 .expect("should not have error on valid URL")
+                .as_ref()
         )
     }
 
@@ -56,6 +62,7 @@ mod tests {
             "hackyordering",
             get_problem_code("open.kattis.com/problems/hackyordering")
                 .expect("should not have error on valid URL")
+                .as_ref()
         )
     }
 
@@ -63,7 +70,9 @@ mod tests {
     fn test_problem_mapper_bare_code() {
         assert_eq!(
             "hackyordering",
-            get_problem_code("hackyordering").expect("should not error on valid pattern")
+            get_problem_code("hackyordering")
+                .expect("should not error on valid pattern")
+                .as_ref()
         )
     }
 
