@@ -1,8 +1,9 @@
-pub mod kattis_mapper;
+pub mod mapper;
+pub mod scraper;
 
 #[cfg(test)]
 mod tests {
-    use crate::kattis_mapper::*;
+    use crate::mapper::*;
 
     #[test]
     fn test_problem_mapper_full_url_contest() {
