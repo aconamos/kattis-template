@@ -13,6 +13,15 @@ pub const KATTIS_URL_RE: std::sync::LazyLock<Regex> = std::sync::LazyLock::new(|
 #[derive(Debug, Clone)]
 pub struct ProblemCode(String);
 
+/// Represents a contest that has a code and problems
+pub struct Contest {
+    /// Code of the Contest
+    pub code: String,
+
+    /// All problems in the Contest
+    pub problems: Vec<ProblemInfo>,
+}
+
 /// Represents a given backend (roughly speaking, language, but this is more general to support things like various IDEs)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 pub enum Backend {
