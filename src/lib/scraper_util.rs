@@ -16,10 +16,13 @@ impl<'a> SelectOne for ElementRef<'a> {
         let first = selection.nth(0);
 
         match first {
+            // No element -> Error
             None => Err(ScraperError::MissingSelector {
                 selector: query.to_string(),
             }
             .into()),
+
+            // More than one element -> Error
             Some(thing) => match selection.nth(0) {
                 None => Ok(thing),
                 Some(_) => Err(ScraperError::MultipleMatches {
