@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
-use kattis_template::Backend;
 use kattis_template::ProblemCode;
+use kattis_template::backends::Backend;
 use kattis_template::cli;
-use kattis_template::scraper;
+use kattis_template::scraping::scraper;
 
 use clap::{Parser, Subcommand};
 

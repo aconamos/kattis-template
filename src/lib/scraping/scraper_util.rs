@@ -1,7 +1,7 @@
 use anyhow::Result;
 use scraper::{ElementRef, Selector};
 
-use crate::scraper::ScraperError;
+use crate::scraping::scraper::ScraperError;
 
 /// Scraping helper trait
 pub trait SelectOne {

@@ -1,10 +1,14 @@
 pub mod cli;
-pub mod scaffold;
-pub mod scraper;
-pub mod scaffolders {}
-mod scraper_util;
+pub mod scraping {
+    pub mod scraper;
+    mod scraper_util;
+}
+pub(crate) mod scaffold {
+    pub mod backends;
+}
 mod types;
 
+pub use scaffold::backends;
 pub use types::*;
 
 #[cfg(test)]

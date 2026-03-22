@@ -3,7 +3,7 @@ use reqwest::StatusCode;
 use scraper::{self, Html, Selector};
 use thiserror::Error;
 
-use crate::scraper_util::*;
+use crate::scraping::scraper_util::*;
 use crate::types::{ProblemCode, ProblemInfo, Sample};
 
 #[derive(Error, Debug)]

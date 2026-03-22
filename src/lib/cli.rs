@@ -2,7 +2,7 @@ use anyhow::{Error, Result};
 use std::{fs::File, io::Write, path::PathBuf};
 use thiserror::Error;
 
-use crate::{ProblemCode, scraper};
+use crate::{ProblemCode, scraping::scraper};
 
 #[derive(Error, Debug)]
 enum CliError {
