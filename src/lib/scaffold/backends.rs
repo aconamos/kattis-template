@@ -3,11 +3,14 @@ use anyhow::{Context, Error, Result};
 use clap::ValueEnum;
 use std::fs;
 
-use thiserror::Error;
-
-use crate::Scaffold;
+mod c;
+mod csharp_dotnet;
+mod java_intellij;
+mod python_uv;
+mod rust;
 
 /// Represents a given backend (roughly speaking, language, but this is more general to support things like various IDEs)
+/// These backends each have a corresponding struct that may contain settings information.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 pub enum Backend {
     C,
@@ -17,30 +20,25 @@ pub enum Backend {
     JavaIntellij,
 }
 
-impl Scaffold for Backend {
-    fn new_contest(
-        &self,
-        contest_info: crate::ContestInfo,
-        path: std::path::PathBuf,
-    ) -> anyhow::Result<()> {
-        todo!()
-    }
+//
+// Backend Structs
+//
+// In the future, these may contain any information about their project settings/configurations.
+// For example, which standard of the C language is being used. Right now, there are just zero-sized
+// structs for the impl of Scaffold.
+//
 
-    fn new_problem(
-        &self,
-        problem_info: crate::ProblemInfo,
-        path: std::path::PathBuf,
-    ) -> anyhow::Result<()> {
-        if !fs::exists(&path).with_context(|| "error checking path")? {
-            if let Err(e) = fs::create_dir(&path) {
-                return Err(ScaffoldingError::FileWriteError {
-                    file: path,
-                    source: e.into(),
-                }
-                .into());
-            };
-        }
+/// C backend with a given standard
+pub struct C {}
 
-        todo!()
-    }
-}
+/// Rust backend
+pub struct Rust {}
+
+/// Python backend, managed by uv
+pub struct PythonUv {}
+
+/// C# backend, using Rider
+pub struct CsharpDotnet {}
+
+/// Java backend, using IntelliJ
+pub struct JavaIntellij {}

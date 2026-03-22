@@ -57,6 +57,6 @@ pub fn download_samples(problem_code: &str, path: PathBuf, write_name: bool) -> 
         }
     }
 
-    // flatten file_write_errors
+    // TODO: flatten file_write_errors
     Ok(())
 }
