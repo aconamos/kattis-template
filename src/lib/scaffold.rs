@@ -69,7 +69,7 @@ impl GraphDir {
         let dirs: Vec<_> = self
             .child_dirs
             .iter()
-            .map(|dir| {
+            .flat_map(|dir| {
                 get_all_possible_substitutions(&dir.name, map)
                     .into_iter()
                     .map(|name| GraphDir {
@@ -78,7 +78,6 @@ impl GraphDir {
                     })
                     .collect::<Vec<_>>()
             })
-            .flatten()
             .collect();
 
         self.child_dirs = dirs;
@@ -86,7 +85,7 @@ impl GraphDir {
         let files: Vec<_> = self
             .files
             .iter()
-            .map(|file| {
+            .flat_map(|file| {
                 get_all_possible_substitutions(&file.name, map)
                     .into_iter()
                     .map(|name| GraphFile {
@@ -95,7 +94,6 @@ impl GraphDir {
                     })
                     .collect::<Vec<_>>()
             })
-            .flatten()
             .collect();
 
         self.files = files;

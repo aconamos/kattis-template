@@ -70,15 +70,14 @@ fn get_kattis_info(html: Html) -> Result<(String, Vec<Sample>)> {
             .collect();
 
         if data.len() == 2 {
-            let input = data[0].text().nth(0).map(|s| s.to_string());
+            let input = data[0].text().next().map(|s| s.to_string());
             let output = data[1]
-                .text()
-                .nth(0)
+                .text().next()
                 .expect("malformed table data who cares")
                 .to_string();
             Sample { input, output }
         } else {
-            let output = data[0].text().nth(0).unwrap().to_string();
+            let output = data[0].text().next().unwrap().to_string();
 
             Sample {
                 input: None,

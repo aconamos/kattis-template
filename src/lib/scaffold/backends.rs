@@ -1,9 +1,4 @@
-use crate::types::ScaffoldingError;
-use anyhow::{Context, Error, Result};
 use clap::ValueEnum;
-use itertools::Itertools;
-use regex::Regex;
-use std::{collections::HashMap, fs, path::PathBuf};
 
 mod c;
 mod csharp_dotnet;

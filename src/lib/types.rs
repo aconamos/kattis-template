@@ -1,5 +1,4 @@
 use anyhow::{Error, Result, anyhow};
-use clap::ValueEnum;
 use std::ops::Deref;
 use std::path::PathBuf;
 use thiserror::Error;
@@ -98,11 +97,11 @@ impl ProblemCode {
         };
 
         if let Some(code) = &captures.name("code") {
-            return Ok(ProblemCode::new_unchecked(code.as_str()));
+            Ok(ProblemCode::new_unchecked(code.as_str()))
         } else {
-            return Err(anyhow!(
+            Err(anyhow!(
                 "could not extract code from input (formatting error)"
-            ));
+            ))
         }
     }
 }
@@ -129,11 +128,11 @@ impl ContestCode {
         };
 
         if let Some(code) = &captures.name("contest") {
-            return Ok(ContestCode::new_unchecked(code.as_str()));
+            Ok(ContestCode::new_unchecked(code.as_str()))
         } else {
-            return Err(anyhow!(
+            Err(anyhow!(
                 "could not extract code from input (formatting error)"
-            ));
+            ))
         }
     }
 }
