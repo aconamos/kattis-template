@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use kattis_template::backends::{Backend, GraphDir};
+use kattis_template::backends::{Backend, GraphDir, GraphFile};
 use kattis_template::cli;
 
 use clap::{Parser, Subcommand};
@@ -44,15 +44,21 @@ enum Commands {
 
 fn main() {
     let gd = GraphDir {
-        name: "$among$us".into(),
+        name: "$among$us$among".into(),
         child_dirs: vec![],
-        files: vec![],
+        files: vec![GraphFile {
+            name: "$among".into(),
+            contents: "Hello 2".into(),
+        }],
     };
 
-    let parent = GraphDir {
+    let mut parent = GraphDir {
         name: "parent".into(),
         child_dirs: vec![gd],
-        files: vec![],
+        files: vec![GraphFile {
+            name: "$us$among".into(),
+            contents: "hello!".into(),
+        }],
     };
 
     let mut map: HashMap<&str, Vec<String>> = HashMap::new();
@@ -60,15 +66,12 @@ fn main() {
     map.insert("$among", vec!["a1".into(), "a2".into()]);
     map.insert("$us", vec!["u1".into(), "u2".into()]);
 
-    use std::time::Instant;
-    let now = Instant::now();
+    parent.expand_children_recurse(&map);
 
-    {
-        let _ = parent.write_down(&map);
-    }
+    println!("{:?}", parent);
 
-    let elapsed = now.elapsed();
-    println!("Elapsed: {:.2?}", elapsed);
+    let _ = parent.write_children_recursive(&PathBuf::from("./out"));
+
     // let args = Args::parse();
 
     // match match args.command {

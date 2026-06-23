@@ -136,6 +136,11 @@ mod tests {
     }
 
     #[test]
+    fn test_ident_extraction_with_repeat() {
+        assert!(get_match_idents("$one$two$one").iter().count() == 3)
+    }
+
+    #[test]
     fn bullshit() {}
 
     #[test]
@@ -145,21 +150,15 @@ mod tests {
         map.insert("$among", vec!["a1".into(), "a2".into()]);
         map.insert("$us", vec!["u1".into(), "u2".into()]);
 
-        // this is my least favorite hack ever and it's only happening for the one test
-        let a1: String = "a1".into();
-        let a2: String = "a2".into();
-        let u1: String = "u1".into();
-        let u2: String = "u2".into();
+        let expected_vec: Vec<String> = vec!["a1u1", "a1u2", "a2u1", "a2u2"]
+            .into_iter()
+            .map(|x| x.into())
+            .collect();
 
-        // i hate strings
-        let expected_vec: Vec<Vec<(String, &String)>> = vec![
-            vec![("$among".into(), &a1), ("$us".into(), &u1)],
-            vec![("$among".into(), &a1), ("$us".into(), &u2)],
-            vec![("$among".into(), &a2), ("$us".into(), &u1)],
-            vec![("$among".into(), &a2), ("$us".into(), &u2)],
-        ];
-
-        assert!(get_all_possible_substitutions("$among$us".into(), &map) == expected_vec)
+        assert_eq!(
+            get_all_possible_substitutions("$among$us".into(), &map),
+            expected_vec
+        )
     }
 
     #[test]
@@ -169,11 +168,36 @@ mod tests {
         map.insert("$among", vec!["a1".into(), "a2".into()]);
         map.insert("$us", vec!["u1".into(), "u2".into()]);
 
-        assert!(
-            get_all_possible_substitutions("$among$us$extraneous!".into(), &map)
-                .iter()
-                .count()
-                == 4
+        let expected_vec: Vec<String> = vec![
+            "a1u1$extraneous",
+            "a1u2$extraneous",
+            "a2u1$extraneous",
+            "a2u2$extraneous",
+        ]
+        .into_iter()
+        .map(|x| x.into())
+        .collect();
+
+        assert_eq!(
+            get_all_possible_substitutions("$among$us$extraneous".into(), &map),
+            expected_vec
+        )
+    }
+
+    #[test]
+    fn test_get_all_possible_substitutions_four_subs_with_duplicate() {
+        let mut map: HashMap<&str, Vec<String>> = HashMap::new();
+
+        map.insert("$among", vec!["a1".into(), "a2".into()]);
+
+        let expected_vec: Vec<String> = vec!["a1a1", "a1a2", "a2a1", "a2a2"]
+            .into_iter()
+            .map(|x| x.into())
+            .collect();
+
+        assert_eq!(
+            get_all_possible_substitutions("$among$among".into(), &map),
+            expected_vec
         )
     }
 }

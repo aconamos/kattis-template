@@ -2,10 +2,7 @@ use std::fs;
 
 use anyhow::Context;
 
-use crate::{
-    Scaffold, ScaffoldingError,
-    backends::{PythonUv, TemplatedFile},
-};
+use crate::{Scaffold, ScaffoldingError, backends::PythonUv};
 
 const PROJECT_FILE: &'static str = r#"""
 [pyproject.toml]

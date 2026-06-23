@@ -3,7 +3,7 @@ use anyhow::{Context, Error, Result};
 use clap::ValueEnum;
 use itertools::Itertools;
 use regex::Regex;
-use std::{collections::HashMap, fs};
+use std::{collections::HashMap, fs, path::PathBuf};
 
 mod c;
 mod csharp_dotnet;
@@ -58,44 +58,37 @@ pub(crate) fn get_match_idents(src: &str) -> Vec<String> {
 
 /// Given a source string containing identifiers, and a map containing substitutions for those identifiers,
 /// returns a vector containing vectors of tuples that identify every possible combination of substitutions.
-pub(crate) fn get_all_possible_substitutions<'a>(
+///
+/// If a given identifier doesn't have a substitution, it is left alone.
+pub(crate) fn get_all_possible_substitutions(
     src_str: &str,
-    map: &'a HashMap<&str, Vec<String>>,
-) -> Vec<Vec<(String, &'a String)>> {
-    let idents = get_match_idents(&src_str);
+    map: &HashMap<&str, Vec<String>>,
+) -> Vec<String> {
+    let identifiers: Vec<String> = get_match_idents(src_str);
+    let mut strs: Vec<String> = vec![src_str.into()];
+    let mut identifiers_left = identifiers.len();
 
-    // the goal here is to turn each identifier into a list of tuples where each
-    // tuple has the identifier and one of the possible substitutions, for every
-    // possible substitution. we'll then take the cross product
-    //
-    // the reason we will keep a tuple including the original identifier
-    // is because it makes taking the cross product a lot easier
-    let substitution_list: Vec<_> = idents
-        .into_iter()
-        .filter_map(|ident| {
-            // easy return if there's no substitutions
-            let Some(subs) = map.get(ident.as_str()) else {
-                return None;
+    while identifiers_left > 0 {
+        let mut temp: Vec<String> = vec![];
+
+        for str in strs {
+            let current_identifier = &identifiers[identifiers.len() - identifiers_left];
+
+            let Some(subs) = map.get(current_identifier as &str) else {
+                temp.push(str);
+                continue;
             };
 
-            Some(
-                subs.into_iter()
-                    // just turn each substitution into its identifier with the sub
-                    // todo: can we get rid of this clone?
-                    .map(|sub| (ident.clone(), sub))
-                    // keep that as a vec or the final one will be weird
-                    .collect::<Vec<_>>(),
-            )
-        })
-        .collect();
+            for sub in subs {
+                temp.push(str.replacen(current_identifier, sub, 1));
+            }
+        }
 
-    let all_possible_substitutions: Vec<_> = substitution_list
-        .into_iter()
-        .multi_cartesian_product()
-        .into_iter()
-        .collect();
-    println!("{:?}", all_possible_substitutions);
-    all_possible_substitutions
+        strs = temp;
+        identifiers_left -= 1;
+    }
+
+    strs
 }
 
 #[derive(Debug, Clone)]
@@ -114,44 +107,73 @@ impl GraphDir {
         }
     }
 
-    pub fn write_down(&self, map: &HashMap<&str, Vec<String>>) -> Result<()> {
+    pub fn expand_children(&mut self, map: &HashMap<&str, Vec<String>>) {
         let dirs: Vec<_> = self
             .child_dirs
             .iter()
-            .map(move |dir| {
+            .map(|dir| {
                 get_all_possible_substitutions(&dir.name, map)
-                    .iter()
-                    .map(|sublist| {
-                        let mut thingamajig = dir.name.clone();
-
-                        for sub in sublist {
-                            thingamajig = thingamajig.replace(&sub.0, sub.1);
-                        }
-
-                        GraphDir {
-                            name: thingamajig,
-                            ..dir.clone()
-                        }
+                    .into_iter()
+                    .map(|name| GraphDir {
+                        name,
+                        ..dir.clone()
                     })
                     .collect::<Vec<_>>()
             })
             .flatten()
             .collect();
 
-        println!("{:?}", dirs);
-        return Ok(());
+        self.child_dirs = dirs;
 
-        for dir in &self.child_dirs {}
-        todo!("Write the children directories");
-        // for dir in dirs {
-        //     // The way that this is called, we expect to be in an empty directory
-        //     fs::create_dir(dir.name)?;
-        // }
-        todo!("Expand the child files");
-        let files = self.files;
-        todo!("Write the child files");
-        for file in files {
-            todo!("expand content using hashmap")
+        let files: Vec<_> = self
+            .files
+            .iter()
+            .map(|file| {
+                get_all_possible_substitutions(&file.name, map)
+                    .into_iter()
+                    .map(|name| GraphFile {
+                        name,
+                        ..file.clone()
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .flatten()
+            .collect();
+
+        self.files = files;
+    }
+
+    pub fn expand_children_recurse(&mut self, map: &HashMap<&str, Vec<String>>) {
+        self.expand_children(map);
+
+        for dir in &mut self.child_dirs {
+            dir.expand_children_recurse(map);
+        }
+    }
+
+    pub fn write_children(&self, path: &PathBuf) -> Result<()> {
+        for dir in &self.child_dirs {
+            let mut path = path.clone();
+            path.push(&dir.name);
+            fs::create_dir(path)?;
+        }
+
+        for file in &self.files {
+            let mut path = path.clone();
+            path.push(&file.name);
+            fs::write(path, &file.contents)?;
+        }
+
+        Ok(())
+    }
+
+    pub fn write_children_recursive(&self, path: &PathBuf) -> Result<()> {
+        self.write_children(path)?;
+
+        for dir in &self.child_dirs {
+            let mut path = path.clone();
+            path.push(&dir.name);
+            dir.write_children_recursive(&path)?;
         }
 
         Ok(())
@@ -162,24 +184,4 @@ impl GraphDir {
 pub struct GraphFile {
     pub name: String,
     pub contents: String,
-}
-
-/// Simple abstraction over a file that contains templated strings (i.e. the strings can have substitutions in them)
-pub struct TemplatedFile {
-    /// Tempalted name of the file
-    name: String,
-
-    /// Templated contents of the file
-    contents: String,
-}
-
-impl TemplatedFile {
-    /// Substitutes a given string for all instances of the identifier in the file's contents and name,
-    /// returning a new TemplatedFile.
-    pub fn make_substition(&self, ident: &str, sub: &str) -> TemplatedFile {
-        TemplatedFile {
-            name: self.name.replace(ident, sub),
-            contents: self.contents.replace(ident, sub),
-        }
-    }
 }
