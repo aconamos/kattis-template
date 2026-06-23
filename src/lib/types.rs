@@ -5,9 +5,16 @@ use thiserror::Error;
 
 use regex::Regex;
 
-pub const KATTIS_URL_RE: std::sync::LazyLock<Regex> = std::sync::LazyLock::new(|| {
+pub const KATTIS_PROBLEM_URL_RE: std::sync::LazyLock<Regex> = std::sync::LazyLock::new(|| {
     Regex::new(r"^((http(s)?://)?open.kattis.com/(contests/(?<contest>[a-z0-9]+)/)?problems/)?(?<code>[a-z]+)$")
         .unwrap()
+});
+
+pub const KATTIS_CONTEST_URL_RE: std::sync::LazyLock<Regex> = std::sync::LazyLock::new(|| {
+    Regex::new(
+        r"^((http(s)?://)?open\.kattis\.com/contests/)?(?<contest>[a-z0-9]+)(/problems(/[a-z]+)?)?$",
+    )
+    .unwrap()
 });
 
 /// Problem code newtype. A problem code is just a string of form [a-z]+.
@@ -88,7 +95,7 @@ impl ProblemCode {
     ///
     /// A code is just some letters.
     pub fn new(input: &str) -> Result<Self> {
-        let captures = KATTIS_URL_RE.captures(input);
+        let captures = KATTIS_PROBLEM_URL_RE.captures(input);
 
         let Some(captures) = captures else {
             return Err(anyhow!(
@@ -119,7 +126,7 @@ impl ContestCode {
     ///
     /// A code is just some letters.
     pub fn new(input: &str) -> Result<Self> {
-        let captures = KATTIS_URL_RE.captures(input);
+        let captures = KATTIS_CONTEST_URL_RE.captures(input);
 
         let Some(captures) = captures else {
             return Err(anyhow!(

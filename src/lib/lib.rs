@@ -14,9 +14,12 @@ mod tests {
     use std::collections::HashMap;
 
     use crate::{
-        scaffold::{GraphDir, get_all_possible_substitutions, get_match_idents},
+        ContestCode,
+        scaffold::{get_all_possible_substitutions, get_match_idents},
         types::ProblemCode,
     };
+
+    // ProblemCode tests
 
     #[test]
     fn test_problem_code_new_full_url_contest() {
@@ -107,6 +110,95 @@ mod tests {
     fn test_problem_code_new_empty_code_bad_format_errors() {
         assert!(ProblemCode::new("hthpghpoidn::/open.kattis.com/problems/hackyordering").is_err())
     }
+
+    // ContestCode tests
+
+    #[test]
+    fn test_contest_code_new_full_url_with_problem() {
+        assert_eq!(
+            "jna6sj",
+            ContestCode::new("https://open.kattis.com/contests/jna6sj/problems/hackyordering")
+                .expect("should not have error on valid URL")
+                .as_ref()
+        )
+    }
+
+    #[test]
+    fn test_contest_code_new_full_url_without_problem() {
+        assert_eq!(
+            "jna6sj",
+            ContestCode::new("https://open.kattis.com/contests/jna6sj")
+                .expect("should not have error on valid URL")
+                .as_ref()
+        )
+    }
+
+    #[test]
+    fn test_contest_code_new_http_url_contest_with_problems() {
+        assert_eq!(
+            "jna6sj",
+            ContestCode::new("http://open.kattis.com/contests/jna6sj/problems")
+                .expect("should not have error on valid URL")
+                .as_ref()
+        )
+    }
+
+    #[test]
+    fn test_contest_code_new_http_url_problems() {
+        assert_eq!(
+            "jna6sj",
+            ContestCode::new("http://open.kattis.com/contests/jna6sj/problems")
+                .expect("should not have error on valid URL")
+                .as_ref()
+        )
+    }
+
+    #[test]
+    fn test_contest_code_new_no_protocol_url() {
+        assert_eq!(
+            "jna6sj",
+            ContestCode::new("open.kattis.com/contests/jna6sj")
+                .expect("should not have error on valid URL")
+                .as_ref()
+        )
+    }
+
+    #[test]
+    fn test_contest_code_new_bare_code() {
+        assert_eq!(
+            "jna6sj",
+            ContestCode::new("jna6sj")
+                .expect("should not error on valid pattern")
+                .as_ref()
+        )
+    }
+
+    #[test]
+    fn test_contest_code_new_empty_code_errors() {
+        assert!(ContestCode::new("").is_err())
+    }
+
+    #[test]
+    fn test_contest_code_new_empty_code_url_errors() {
+        assert!(ContestCode::new("https://open.kattis.com/problems/").is_err())
+    }
+
+    #[test]
+    fn test_contest_code_new_empty_code_shorturl_errors() {
+        assert!(ContestCode::new("open.kattis.com/problems/").is_err())
+    }
+
+    #[test]
+    fn test_contest_code_new_problem_errors() {
+        assert!(ContestCode::new("open.kattis.com/problems/hackyordering").is_err())
+    }
+
+    #[test]
+    fn test_contest_code_new_empty_code_bad_format_errors() {
+        assert!(ContestCode::new("hthpghpoidn::/open.kattis.com/problems/hackyordering").is_err())
+    }
+
+    // Identifier extraction
 
     #[test]
     fn test_ident_extraction_with_one_match() {
