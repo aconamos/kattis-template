@@ -3,6 +3,8 @@ use std::path::PathBuf;
 
 use kattis_template::backends::Backend;
 use kattis_template::scaffold::{GraphDir, GraphFile};
+use kattis_template::scraping::scraper::scrape_kattis_problem;
+use kattis_template::{ProblemCode, cli};
 
 use clap::{Parser, Subcommand};
 
@@ -39,55 +41,30 @@ enum Commands {
         /// The language to initialize.
         #[arg(long)]
         language: Backend,
+
+        /// Path to directory to initialize the contest project at. Defaults to a new
+        /// directory with the contest code.
+        #[arg(long, value_name = "directory")]
+        path: PathBuf,
     },
 }
 
 fn main() {
-    let gd = GraphDir {
-        name: "$among$us$among".into(),
-        child_dirs: vec![],
-        files: vec![GraphFile {
-            name: "$among".into(),
-            contents: "Hello 2".into(),
-        }],
-    };
+    let args = Args::parse();
 
-    let mut parent = GraphDir {
-        name: "parent".into(),
-        child_dirs: vec![gd],
-        files: vec![GraphFile {
-            name: "$us$among".into(),
-            contents: "hello!".into(),
-        }],
-    };
-
-    let mut map: HashMap<&str, Vec<String>> = HashMap::new();
-
-    map.insert("$among", vec!["a1".into(), "a2".into()]);
-    map.insert("$us", vec!["u1".into(), "u2".into()]);
-
-    parent.expand_children_recurse(&map);
-
-    println!("{:?}", parent);
-
-    let _ = parent.write_children_recursive(&PathBuf::from("./out"));
-
-    // let args = Args::parse();
-
-    // match match args.command {
-    //     Commands::DownloadSamples {
-    //         problem,
-    //         path,
-    //         write_name,
-    //     } => cli::download_samples(&problem, path, write_name),
-    //     Commands::InitializeContest { .. } => todo!(),
-    // } {
-    //     Err(e) => eprintln!("Error: {e:?}"),
-    //     Ok(_) => println!("Samples downloaded!"),
-    // }
-
-    // println!(
-    //     "{:?}",
-    //     scraper::scrape_kattis_problem(ProblemCode::new(&args.problem).unwrap()).unwrap()
-    // );
+    match match args.command {
+        Commands::DownloadSamples {
+            problem,
+            path,
+            write_name,
+        } => cli::download_samples(&problem, path, write_name),
+        Commands::InitializeContest {
+            contest,
+            language,
+            path,
+        } => cli::initialize_contest(&contest, language, path),
+    } {
+        Err(e) => eprintln!("Error: {e:?}"),
+        Ok(_) => println!("Samples downloaded!"),
+    }
 }

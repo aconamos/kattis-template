@@ -2,7 +2,11 @@ use anyhow::{Error, Result};
 use std::{fs::File, io::Write, path::PathBuf};
 use thiserror::Error;
 
-use crate::{ProblemCode, scraping::scraper};
+use crate::{
+    ContestCode, ProblemCode, Scaffold,
+    backends::{Backend, PythonUv},
+    scraping::scraper,
+};
 
 #[derive(Error, Debug)]
 enum CliError {
@@ -58,5 +62,16 @@ pub fn download_samples(problem_code: &str, path: PathBuf, write_name: bool) -> 
     }
 
     // TODO: flatten file_write_errors
+    Ok(())
+}
+
+pub fn initialize_contest(contest_code: &str, backend: Backend, path: PathBuf) -> Result<()> {
+    println!("contest_code: {:?}", contest_code);
+    let contest_code = ContestCode::new(contest_code)?;
+    let contest_info = scraper::scrape_kattis_contest(&contest_code)?;
+
+    let x = PythonUv {};
+    x.new_contest(contest_info, path)?;
+
     Ok(())
 }

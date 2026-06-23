@@ -1,20 +1,24 @@
-use std::fs;
+use std::{collections::HashMap, fs};
 
 use anyhow::Context;
 
-use crate::{Scaffold, ScaffoldingError, backends::PythonUv};
+use crate::{
+    Scaffold, ScaffoldingError,
+    backends::PythonUv,
+    scaffold::{GraphDir, GraphFile},
+};
 
-const PROJECT_FILE: &str = r#"""
-[pyproject.toml]
+const PROJECT_FILE: &str = r#"
+[project]
 name = "{contest_name}"
 version = "0.1.0"
 description = "Kattis template for {contest_name}"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = []
-"""#;
+"#;
 
-const PROBLEM_FILE: &str = r#"""
+const PROBLEM_FILE: &str = r#"
 import sys
 
 
@@ -28,28 +32,59 @@ def main():
 
 if __name__ == "__main__":
     main() 
-    """#;
+    "#;
 
 impl Scaffold for PythonUv {
     fn new_contest(
         &self,
-        _contest_info: crate::ContestInfo,
+        contest_info: crate::ContestInfo,
         path: std::path::PathBuf,
     ) -> anyhow::Result<()> {
         if !fs::exists(&path).with_context(|| "error checking path")?
-            && let Err(e) = fs::create_dir(&path) {
-                return Err(ScaffoldingError::FileWriteError {
-                    file: path,
-                    source: e.into(),
-                }
-                .into());
+            && let Err(e) = fs::create_dir(&path)
+        {
+            return Err(ScaffoldingError::FileWriteError {
+                file: path,
+                source: e.into(),
             }
+            .into());
+        }
 
         if fs::read_dir(&path)?.count() != 0 {
             return Err(ScaffoldingError::NonemptyDirectoryError { directory: path }.into());
         }
 
-        todo!()
+        let mut root = GraphDir {
+            name: "root".into(),
+            child_dirs: vec![GraphDir {
+                name: "src".into(),
+                child_dirs: vec![],
+                files: vec![GraphFile {
+                    name: "$problem.py".into(),
+                    contents: PROBLEM_FILE.into(),
+                }],
+            }],
+            files: vec![GraphFile {
+                name: "pyproject.toml".into(),
+                contents: PROJECT_FILE.replace("{contest_name}", &contest_info.title),
+            }],
+        };
+
+        let mut map: HashMap<&str, Vec<String>> = HashMap::new();
+
+        map.insert(
+            "$problem",
+            contest_info
+                .problems
+                .iter()
+                .map(|prob| prob.code.to_string())
+                .collect::<Vec<_>>(),
+        );
+
+        root.expand_children_recurse(&map);
+        root.write_children_recursive(&path)?;
+
+        Ok(())
     }
 
     fn new_problem(
