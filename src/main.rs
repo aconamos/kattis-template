@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use kattis_template::backends::{Backend, GraphDir, GraphFile};
+use kattis_template::backends::Backend;
 use kattis_template::cli;
+use kattis_template::scaffold::{GraphDir, GraphFile};
 
 use clap::{Parser, Subcommand};
 

@@ -3,9 +3,7 @@ pub mod scraping {
     pub mod scraper;
     mod scraper_util;
 }
-pub(crate) mod scaffold {
-    pub mod backends;
-}
+pub mod scaffold;
 mod types;
 
 pub use scaffold::backends;
@@ -16,7 +14,7 @@ mod tests {
     use std::collections::HashMap;
 
     use crate::{
-        backends::{GraphDir, get_all_possible_substitutions, get_match_idents},
+        scaffold::{GraphDir, get_all_possible_substitutions, get_match_idents},
         types::ProblemCode,
     };
 
