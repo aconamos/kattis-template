@@ -62,6 +62,9 @@ pub enum ScaffoldingError {
         #[source]
         source: Error,
     },
+
+    #[error("directory was not empty: {directory}")]
+    NonemptyDirectoryError { directory: PathBuf },
 }
 
 /// This is the collection of options available for a general backend. This means things like a Java boilerplate, a Rust boilerplate, a Python boilerplate, etc.

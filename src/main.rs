@@ -1,9 +1,8 @@
+use std::collections::HashMap;
 use std::path::PathBuf;
 
-use kattis_template::ProblemCode;
-use kattis_template::backends::Backend;
+use kattis_template::backends::{Backend, GraphDir};
 use kattis_template::cli;
-use kattis_template::scraping::scraper;
 
 use clap::{Parser, Subcommand};
 
@@ -44,19 +43,45 @@ enum Commands {
 }
 
 fn main() {
-    let args = Args::parse();
+    let gd = GraphDir {
+        name: "$among$us".into(),
+        child_dirs: vec![],
+        files: vec![],
+    };
 
-    match match args.command {
-        Commands::DownloadSamples {
-            problem,
-            path,
-            write_name,
-        } => cli::download_samples(&problem, path, write_name),
-        Commands::InitializeContest { .. } => todo!(),
-    } {
-        Err(e) => eprintln!("Error: {e:?}"),
-        Ok(_) => println!("Samples downloaded!"),
+    let parent = GraphDir {
+        name: "parent".into(),
+        child_dirs: vec![gd],
+        files: vec![],
+    };
+
+    let mut map: HashMap<&str, Vec<String>> = HashMap::new();
+
+    map.insert("$among", vec!["a1".into(), "a2".into()]);
+    map.insert("$us", vec!["u1".into(), "u2".into()]);
+
+    use std::time::Instant;
+    let now = Instant::now();
+
+    {
+        let _ = parent.write_down(&map);
     }
+
+    let elapsed = now.elapsed();
+    println!("Elapsed: {:.2?}", elapsed);
+    // let args = Args::parse();
+
+    // match match args.command {
+    //     Commands::DownloadSamples {
+    //         problem,
+    //         path,
+    //         write_name,
+    //     } => cli::download_samples(&problem, path, write_name),
+    //     Commands::InitializeContest { .. } => todo!(),
+    // } {
+    //     Err(e) => eprintln!("Error: {e:?}"),
+    //     Ok(_) => println!("Samples downloaded!"),
+    // }
 
     // println!(
     //     "{:?}",
