@@ -3,9 +3,9 @@ use std::{collections::HashMap, fs};
 use anyhow::Context;
 
 use crate::{
-    Scaffold, ScaffoldingError,
+    Scaffold,
     backends::PythonUv,
-    scaffold::{GraphDir, GraphFile},
+    scaffold::{GraphDir, GraphFile, ScaffoldingError},
 };
 
 const PROJECT_FILE: &str = r#"

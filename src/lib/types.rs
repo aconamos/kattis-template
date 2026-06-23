@@ -58,21 +58,6 @@ pub struct ContestInfo {
     pub problems: Vec<ProblemInfo>,
 }
 
-#[derive(Error, Debug)]
-pub enum ScaffoldingError {
-    // todo: dedupe this from cli::CliError
-    #[error("failed to create file: {file}; reason: {source:?}")]
-    FileWriteError {
-        file: PathBuf,
-
-        #[source]
-        source: Error,
-    },
-
-    #[error("directory was not empty: {directory}")]
-    NonemptyDirectoryError { directory: PathBuf },
-}
-
 /// This is the collection of options available for a general backend. This means things like a Java boilerplate, a Rust boilerplate, a Python boilerplate, etc.
 pub trait Scaffold {
     /// Initializes a new contest inside the `path` directory, creating it if it doesn't exist.

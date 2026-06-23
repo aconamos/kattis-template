@@ -6,7 +6,7 @@ pub mod scraping {
 pub mod scaffold;
 mod types;
 
-pub use scaffold::backends;
+pub mod backends;
 pub use types::*;
 
 #[cfg(test)]
