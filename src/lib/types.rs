@@ -1,7 +1,5 @@
-use anyhow::{Error, Result, anyhow};
+use anyhow::{Result, anyhow};
 use std::ops::Deref;
-use std::path::PathBuf;
-use thiserror::Error;
 
 use regex::Regex;
 

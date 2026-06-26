@@ -1,10 +1,7 @@
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 use kattis_template::backends::Backend;
-use kattis_template::scaffold::{GraphDir, GraphFile};
-use kattis_template::scraping::scraper::scrape_kattis_problem;
-use kattis_template::{ProblemCode, cli};
+use kattis_template::cli;
 
 use clap::{Parser, Subcommand};
 

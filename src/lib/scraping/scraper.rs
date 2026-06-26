@@ -61,7 +61,7 @@ pub fn scrape_kattis_contest(code: &ContestCode) -> Result<ContestInfo> {
     Ok(ContestInfo {
         code: code.clone(),
         title: contest_info.0,
-        problems: problems,
+        problems,
     })
 }
 
@@ -118,7 +118,7 @@ fn get_kattis_contest_info(html: Html) -> Result<(String, Vec<ProblemCode>)> {
         .filter_map(|el| el.attr("href"))
         .map(|href| {
             href.split('/')
-                .last()
+                .next_back()
                 .expect("extracted href has no slashes???")
         })
         .map(|problem_code| ProblemCode::new(problem_code).expect("problem code from href is bad"))
