@@ -5,6 +5,8 @@ use thiserror::Error;
 
 use regex::Regex;
 
+use crate::scaffold::GraphDir;
+
 pub const KATTIS_PROBLEM_URL_RE: std::sync::LazyLock<Regex> = std::sync::LazyLock::new(|| {
     Regex::new(r"^((http(s)?://)?open.kattis.com/(contests/(?<contest>[a-z0-9]+)/)?problems/)?(?<code>[a-z]+)$")
         .unwrap()
@@ -60,11 +62,11 @@ pub struct ContestInfo {
 
 /// This is the collection of options available for a general backend. This means things like a Java boilerplate, a Rust boilerplate, a Python boilerplate, etc.
 pub trait Scaffold {
-    /// Initializes a new contest inside the `path` directory, creating it if it doesn't exist.
-    fn new_contest(&self, contest_info: ContestInfo, path: PathBuf) -> Result<()>;
+    /// Generate a directory structure for the given contest info. The returned node represents the directory containing the project.
+    fn new_contest(&self, contest_info: ContestInfo) -> Result<GraphDir>;
 
-    /// Initializes a new problem inside the `path` directory, creating it if it doesn't exist.
-    fn new_problem(&self, problem_info: ProblemInfo, path: PathBuf) -> Result<()>;
+    /// Generate a directory structure for the given problem info. The returned node represents the directory containing the project.
+    fn new_problem(&self, problem_info: ProblemInfo) -> Result<GraphDir>;
 }
 
 impl ProblemCode {

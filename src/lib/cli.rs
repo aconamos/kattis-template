@@ -1,5 +1,9 @@
-use anyhow::{Error, Result};
-use std::{fs::File, io::Write, path::PathBuf};
+use anyhow::{Context as _, Error, Result};
+use std::{
+    fs::{self, File},
+    io::Write,
+    path::PathBuf,
+};
 use thiserror::Error;
 
 use crate::{
@@ -23,6 +27,9 @@ enum CliError {
         #[source]
         source: Error,
     },
+
+    #[error("directory was not empty: {directory}")]
+    NonemptyDirectoryError { directory: PathBuf },
 }
 
 /// Downloads the samples for the given ProblemCode.
@@ -66,12 +73,33 @@ pub fn download_samples(problem_code: &str, path: PathBuf, write_name: bool) -> 
 }
 
 pub fn initialize_contest(contest_code: &str, backend: Backend, path: PathBuf) -> Result<()> {
-    println!("contest_code: {:?}", contest_code);
+    if !fs::exists(&path).with_context(|| "error checking path")?
+        && let Err(e) = fs::create_dir(&path)
+    {
+        return Err(CliError::FileWriteError {
+            file: path.to_string_lossy().into(),
+            source: e.into(),
+        }
+        .into());
+    }
+
+    if fs::read_dir(&path)?.count() != 0 {
+        return Err(CliError::NonemptyDirectoryError { directory: path }.into());
+    }
+
     let contest_code = ContestCode::new(contest_code)?;
     let contest_info = scraper::scrape_kattis_contest(&contest_code)?;
 
-    let x = PythonUv {};
-    x.new_contest(contest_info, path)?;
+    let backend = match backend {
+        Backend::C => todo!(),
+        Backend::Rust => todo!(),
+        Backend::PythonUv => PythonUv {},
+        Backend::CsharpDotnet => todo!(),
+        Backend::JavaIntellij => todo!(),
+    };
+
+    let contest_files = backend.new_contest(contest_info)?;
+    contest_files.write_children_recursive(&path)?;
 
     Ok(())
 }

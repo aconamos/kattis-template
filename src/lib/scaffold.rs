@@ -1,23 +1,11 @@
-use anyhow::{Error, Result};
+use anyhow::Result;
 use std::{collections::HashMap, fs, path::PathBuf};
 use thiserror::Error;
 
 use regex::Regex;
 
 #[derive(Error, Debug)]
-pub enum ScaffoldingError {
-    // todo: dedupe this from cli::CliError
-    #[error("failed to create file: {file}; reason: {source:?}")]
-    FileWriteError {
-        file: PathBuf,
-
-        #[source]
-        source: Error,
-    },
-
-    #[error("directory was not empty: {directory}")]
-    NonemptyDirectoryError { directory: PathBuf },
-}
+pub enum ScaffoldingError {}
 pub const IDENT_RE: std::sync::LazyLock<Regex> =
     std::sync::LazyLock::new(|| Regex::new(r"\$[a-zA-Z0-9]+").unwrap());
 /// Uses the identifier regex [`IDENT_RE`] to extract every match in the string.

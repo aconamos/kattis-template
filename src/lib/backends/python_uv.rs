@@ -1,11 +1,9 @@
-use std::{collections::HashMap, fs};
-
-use anyhow::Context;
+use std::collections::HashMap;
 
 use crate::{
     Scaffold,
     backends::PythonUv,
-    scaffold::{GraphDir, GraphFile, ScaffoldingError},
+    scaffold::{GraphDir, GraphFile},
 };
 
 const PROJECT_FILE: &str = r#"
@@ -35,25 +33,7 @@ if __name__ == "__main__":
     "#;
 
 impl Scaffold for PythonUv {
-    fn new_contest(
-        &self,
-        contest_info: crate::ContestInfo,
-        path: std::path::PathBuf,
-    ) -> anyhow::Result<()> {
-        if !fs::exists(&path).with_context(|| "error checking path")?
-            && let Err(e) = fs::create_dir(&path)
-        {
-            return Err(ScaffoldingError::FileWriteError {
-                file: path,
-                source: e.into(),
-            }
-            .into());
-        }
-
-        if fs::read_dir(&path)?.count() != 0 {
-            return Err(ScaffoldingError::NonemptyDirectoryError { directory: path }.into());
-        }
-
+    fn new_contest(&self, contest_info: crate::ContestInfo) -> anyhow::Result<GraphDir> {
         let mut root = GraphDir {
             name: "root".into(),
             child_dirs: vec![GraphDir {
@@ -82,16 +62,11 @@ impl Scaffold for PythonUv {
         );
 
         root.expand_children_recurse(&map);
-        root.write_children_recursive(&path)?;
 
-        Ok(())
+        Ok(root)
     }
 
-    fn new_problem(
-        &self,
-        _problem_info: crate::ProblemInfo,
-        _path: std::path::PathBuf,
-    ) -> anyhow::Result<()> {
+    fn new_problem(&self, _problem_info: crate::ProblemInfo) -> anyhow::Result<GraphDir> {
         todo!()
     }
 }
