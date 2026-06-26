@@ -8,7 +8,7 @@ use thiserror::Error;
 
 use crate::{
     ContestCode, ProblemCode, Scaffold,
-    backends::{Backend, PythonUv},
+    backends::{Backend, PythonUv, Rust},
     scraping::scraper,
 };
 
@@ -90,10 +90,11 @@ pub fn initialize_contest(contest_code: &str, backend: Backend, path: PathBuf) -
     let contest_code = ContestCode::new(contest_code)?;
     let contest_info = scraper::scrape_kattis_contest(&contest_code)?;
 
-    let backend = match backend {
+    // todo: doing box::new is kinda dumb
+    let backend: Box<dyn Scaffold> = match backend {
         Backend::C => todo!(),
-        Backend::Rust => todo!(),
-        Backend::PythonUv => PythonUv {},
+        Backend::Rust => Box::new(Rust {}),
+        Backend::PythonUv => Box::new(PythonUv {}),
         Backend::CsharpDotnet => todo!(),
         Backend::JavaIntellij => todo!(),
     };
