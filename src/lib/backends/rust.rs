@@ -66,13 +66,15 @@ impl Scaffold for Rust {
             contents: (CARGO_TOML.replace("{contest_name}", &contest_info.code) + &binary_targets),
         };
 
-        let gitignore = GraphFile {
-            name: ".gitignore".into(),
-            contents: "/target".into(),
-        };
+        // TODO: Make decision on including .gitignore
+
+        // let gitignore = GraphFile {
+        //     name: ".gitignore".into(),
+        //     contents: "/target".into(),
+        // };
 
         root.files.push(cargo_toml);
-        root.files.push(gitignore);
+        // root.files.push(gitignore);
         root.child_dirs.push(src);
 
         let mut map: HashMap<&str, Vec<String>> = HashMap::new();
@@ -89,7 +91,38 @@ impl Scaffold for Rust {
         Ok(root)
     }
 
-    fn new_problem(&self, _problem_info: crate::ProblemInfo) -> anyhow::Result<GraphDir> {
-        todo!()
+    fn new_problem(&self, problem_info: crate::ProblemInfo) -> anyhow::Result<GraphDir> {
+        let mut root = GraphDir {
+            name: "root".into(),
+            child_dirs: vec![],
+            files: vec![],
+        };
+
+        let src = GraphDir {
+            name: "src".into(),
+            child_dirs: vec![],
+            files: vec![GraphFile {
+                name: "main.rs".into(),
+                contents: PROJECT_FILE.to_owned(),
+            }],
+        };
+
+        let cargo_toml = GraphFile {
+            name: "Cargo.toml".into(),
+            contents: CARGO_TOML.replace("{contest_name}", &problem_info.code),
+        };
+
+        // TODO: Make decision on including .gitignore
+
+        // let gitignore = GraphFile {
+        //     name: ".gitignore".into(),
+        //     contents: "/target".into(),
+        // };
+
+        root.files.push(cargo_toml);
+        // root.files.push(gitignore);
+        root.child_dirs.push(src);
+
+        Ok(root)
     }
 }

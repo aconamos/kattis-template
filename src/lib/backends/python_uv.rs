@@ -66,7 +66,22 @@ impl Scaffold for PythonUv {
         Ok(root)
     }
 
-    fn new_problem(&self, _problem_info: crate::ProblemInfo) -> anyhow::Result<GraphDir> {
-        todo!()
+    fn new_problem(&self, problem_info: crate::ProblemInfo) -> anyhow::Result<GraphDir> {
+        let root = GraphDir {
+            name: "root".into(),
+            child_dirs: vec![],
+            files: vec![
+                GraphFile {
+                    name: "pyproject.toml".into(),
+                    contents: PROJECT_FILE.replace("{contest_name}", &problem_info.title),
+                },
+                GraphFile {
+                    name: "{problem}.py".replace("{problem}", &problem_info.code),
+                    contents: PROBLEM_FILE.into(),
+                },
+            ],
+        };
+
+        Ok(root)
     }
 }
