@@ -30,7 +30,7 @@ enum Commands {
         write_name: bool,
     },
 
-    /// Initializes a project by writing boilerplate for each problem into a new directory.
+    /// Initializes a project by writing boilerplate for each problem in a contest into a new directory.
     InitializeContest {
         /// The contest. This could be a Kattis URL or just the contest code.
         contest: String,
@@ -39,8 +39,25 @@ enum Commands {
         #[arg(long)]
         language: Backend,
 
+        // TODO: Make the default for the path option work
         /// Path to directory to initialize the contest project at. Defaults to a new
         /// directory with the contest code.
+        #[arg(long, value_name = "directory")]
+        path: PathBuf,
+    },
+
+    /// Initializes a project by writing boilerplate for a single problem into a new directory.
+    InitializeProblem {
+        /// The problem. This could be a Kattis URL or just the problem code.
+        problem: String,
+
+        /// The language to initialize.
+        #[arg(long)]
+        language: Backend,
+
+        // TODO: Make the default for the path option work
+        /// Path to directory to initialize the problem project at. Defaults to a new
+        /// directory with the problem code.
         #[arg(long, value_name = "directory")]
         path: PathBuf,
     },
@@ -60,6 +77,11 @@ fn main() {
             language,
             path,
         } => cli::initialize_contest(&contest, language, path),
+        Commands::InitializeProblem {
+            problem,
+            language,
+            path,
+        } => cli::initialize_problem(&problem, language, path),
     } {
         Err(e) => eprintln!("Error: {e:?}"),
         Ok(_) => println!("Samples downloaded!"),

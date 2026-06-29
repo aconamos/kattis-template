@@ -7,7 +7,7 @@ use std::{
 use thiserror::Error;
 
 use crate::{
-    ContestCode, ProblemCode, Scaffold,
+    ContestCode, ProblemCode, ProblemInfo, Scaffold,
     backends::{Backend, PythonUv, Rust},
     scraping::scraper,
 };
@@ -73,6 +73,45 @@ pub fn download_samples(problem_code: &str, path: PathBuf, write_name: bool) -> 
 }
 
 pub fn initialize_contest(contest_code: &str, backend: Backend, path: PathBuf) -> Result<()> {
+    ensure_directory_empty_or_create(&path)?;
+
+    let contest_code = ContestCode::new(contest_code)?;
+    let contest_info = scraper::scrape_kattis_contest(&contest_code)?;
+
+    let scaffoldable = get_backend_as_scaffold(backend);
+    let contest_files = scaffoldable.new_contest(contest_info)?;
+    contest_files.write_children_recursive(&path)?;
+
+    Ok(())
+}
+
+pub fn initialize_problem(problem_code: &str, backend: Backend, path: PathBuf) -> Result<()> {
+    ensure_directory_empty_or_create(&path)?;
+
+    let problem_code = ProblemCode::new(problem_code)?;
+    let problem_info = scraper::scrape_kattis_problem(&problem_code)?;
+
+    let scaffoldable = get_backend_as_scaffold(backend);
+    let contest_files = scaffoldable.new_problem(problem_info)?;
+    contest_files.write_children_recursive(&path)?;
+
+    Ok(())
+}
+
+fn get_backend_as_scaffold(backend: Backend) -> Box<dyn Scaffold> {
+    // todo: doing box::new is kinda dumb
+    let backend: Box<dyn Scaffold> = match backend {
+        Backend::C => todo!(),
+        Backend::Rust => Box::new(Rust {}),
+        Backend::PythonUv => Box::new(PythonUv {}),
+        Backend::CsharpDotnet => todo!(),
+        Backend::JavaIntellij => todo!(),
+    };
+
+    backend
+}
+
+fn ensure_directory_empty_or_create(path: &PathBuf) -> Result<()> {
     if !fs::exists(&path).with_context(|| "error checking path")?
         && let Err(e) = fs::create_dir(&path)
     {
@@ -84,23 +123,11 @@ pub fn initialize_contest(contest_code: &str, backend: Backend, path: PathBuf) -
     }
 
     if fs::read_dir(&path)?.count() != 0 {
-        return Err(CliError::NonemptyDirectoryError { directory: path }.into());
+        return Err(CliError::NonemptyDirectoryError {
+            directory: path.clone(),
+        }
+        .into());
     }
-
-    let contest_code = ContestCode::new(contest_code)?;
-    let contest_info = scraper::scrape_kattis_contest(&contest_code)?;
-
-    // todo: doing box::new is kinda dumb
-    let backend: Box<dyn Scaffold> = match backend {
-        Backend::C => todo!(),
-        Backend::Rust => Box::new(Rust {}),
-        Backend::PythonUv => Box::new(PythonUv {}),
-        Backend::CsharpDotnet => todo!(),
-        Backend::JavaIntellij => todo!(),
-    };
-
-    let contest_files = backend.new_contest(contest_info)?;
-    contest_files.write_children_recursive(&path)?;
 
     Ok(())
 }
