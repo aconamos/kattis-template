@@ -46,7 +46,7 @@ impl Scaffold for PythonUv {
             }],
             files: vec![GraphFile {
                 name: "pyproject.toml".into(),
-                contents: PROJECT_FILE.replace("{contest_name}", &contest_info.title),
+                contents: PROJECT_FILE.replace("{contest_name}", &contest_info.code),
             }],
         };
 
@@ -73,7 +73,7 @@ impl Scaffold for PythonUv {
             files: vec![
                 GraphFile {
                     name: "pyproject.toml".into(),
-                    contents: PROJECT_FILE.replace("{contest_name}", &problem_info.title),
+                    contents: PROJECT_FILE.replace("{contest_name}", &problem_info.code),
                 },
                 GraphFile {
                     name: "{problem}.py".replace("{problem}", &problem_info.code),
